@@ -52,7 +52,7 @@ module.exports = (express) => {
                             let token = jwt.sign(payload, process.env.SECRET);
                             res.json({ con: true, token: token, email: userE.email, name: userE.name, role: userE.role });
                         } else {
-                            res.json({ con: false, msg: 'password worng' });
+                            res.json({ con: false, msg: 'password wrong' });
                         }
                     }).catch(err => res.json({ con: false, msg: err }));
             })

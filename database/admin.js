@@ -12,13 +12,15 @@ let all_admin = () => {
     })
 };
 
+
 let save_admin = (adminObj) => {
     return new Promise((resolve, reject) => {
         adminObj['since'] = new Date();
+        adminObj['role'] = 'admin';
         let admin = new Admin(adminObj);
-        admin.save((error, data) => {
-            if (error) reject(error);
-            resolve(data);
+        admin.save((err, data) => {
+            if (err) reject(err);
+            resolve(data)
         })
     })
 };
@@ -54,8 +56,8 @@ let delete_admin = (admin_name) => {
 let findByAdminemail = (findemail) => {
     return new Promise((resolve, reject) => {
         Admin.findOne({ email: findemail }, (error, data) => {
-            if (error) reject(error);
-            resolve(data)
+            if (data == null || data == undefined) reject('No admin',error);
+            resolve(data);
         })
     })
 }

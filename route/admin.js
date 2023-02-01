@@ -37,9 +37,9 @@ module.exports = (express, bodyParser) => {
                         if (result) {
                             let payload = { email: admin.email, name: admin.name };
                             let token = jwt.sign(payload, process.env.SECRET);
-                            res.send({ con: true, token: token });
+                            res.json({ con: true, token: token, name: admin });
                         } else {
-                            res.send('password wrong')
+                            res.json({ con: false, msg: 'password wrong' })
                         }
                     }).catch(err => res.send({ con: false, msg: err }));
             })
@@ -48,10 +48,10 @@ module.exports = (express, bodyParser) => {
 
     // Admin Register route
 
-    router.post('/adminRegister', (req, res) => {
+    router.post('/adminRegister',  (req, res) => {
+        let name = req.body.name;
         let email = req.body.email;
         let password = req.body.password;
-        let name = req.body.name;
         bcrypt.encrypt(password)
             .then(result => {
                 let adminobj = {
@@ -60,22 +60,22 @@ module.exports = (express, bodyParser) => {
                     'password': result
                 };
                 Admin.save_admin(adminobj)
-                    .then(admin => res.send({ con: true, msg: admin }))
-                    .catch(err => res.send({ con: false, msg: err }));
+                    .then(admin => res.json({ con: true, msg: admin }))
+                    .catch(err => res.json({ con: false, msg: err }));
 
             })
-            .catch(err => res.send({ con: false, msg: err }));
+            .catch(err => res.json({ con: false, msg: err }));
     });
 
 
-    router.get('/all', (req, res) => {
+    router.get('/all', passport.authenticate('jwt', { session: false }), (req, res) => {
         Admin.all_admin()
-            .then(result => res.send({ con: true, msg: result }))
-            .catch(err => res.send({ con: false, msg: err }));
+            .then(result => res.json({ con: true, msg: result }))
+            .catch(err => res.json({ con: false, msg: err }));
 
     });
 
-    router.get('/update', (req, res) => {
+    router.get('/update', passport.authenticate('jwt', { session: false }), (req, res) => {
         let adminobj = {
             name: req.body.name,
             email: req.body.email,
@@ -89,7 +89,7 @@ module.exports = (express, bodyParser) => {
     // Admin Movie Part 
 
     // passport.authenticate('jwt', { session: false }),
-    router.post('/post/movie', upload.single('image'), (req, res) => {
+    router.post('/post/movie', passport.authenticate('jwt', { session: false }), upload.single('image'), (req, res) => {
         let movieobj = {
             name: req.body.name,
             image: req.file.filename,
@@ -97,16 +97,17 @@ module.exports = (express, bodyParser) => {
             rating: req.body.rating,
             creater: req.body.creater,
             category: req.body.category,
-            discription: req.body.discription,
+            overview: req.body.overview,
             series: req.body.series,
-            trailer1: req.body.trailer,
-            trailer2: req.body.trailer,
+            trailer1: req.body.trailer1,
+            trailer2: req.body.trailer2,
             trailer3: req.body.trailer3,
             Network: req.body.Network,
             age_rating: req.body.age_rating,
             // weekly_download: req.body.weekly_download,
 
             // 1
+            download1site: req.body.download1site,
             download1Low: req.body.download1Low,
             download1Lowtext: req.body.download1Lowtext,
             download1High: req.body.download1High,
@@ -114,6 +115,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download2site: req.body.download2site,
             download2Low: req.body.download2Low,
             download2Lowtext: req.body.download2Lowtext,
             download2High: req.body.download2High,
@@ -121,6 +123,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download3site: req.body.download3site,
             download3Low: req.body.download3Low,
             download3Lowtext: req.body.download3Lowtext,
             download3High: req.body.download3High,
@@ -128,6 +131,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download4site: req.body.download4site,
             download4Low: req.body.download4Low,
             download4Lowtext: req.body.download4Lowtext,
             download4High: req.body.download4High,
@@ -135,6 +139,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download5site: req.body.download5site,
             download5Low: req.body.download5Low,
             download5Lowtext: req.body.download5Lowtext,
             download5High: req.body.download5High,
@@ -142,6 +147,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download6site: req.body.download6site,
             download6Low: req.body.download6Low,
             download6Lowtext: req.body.download6Lowtext,
             download6High: req.body.download6High,
@@ -149,6 +155,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download7site: req.body.download7site,
             download7Low: req.body.download7Low,
             download7Lowtext: req.body.download7Lowtext,
             download7High: req.body.download7High,
@@ -156,6 +163,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download8site: req.body.download8site,
             download8Low: req.body.download8Low,
             download8Lowtext: req.body.download8Lowtext,
             download8High: req.body.download8High,
@@ -163,6 +171,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download9site: req.body.download9site,
             download9Low: req.body.download9Low,
             download9Lowtext: req.body.download9Lowtext,
             download9High: req.body.download9High,
@@ -170,25 +179,25 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download10site: req.body.download10site,
             download10Low: req.body.download10Low,
             download10Lowtext: req.body.download10Lowtext,
             download10High: req.body.download10High,
             download10Hightext: req.body.download10Hightext,
 
             // 1
-
-
             encoder: req.body.encoder,
             translator: req.body.translator,
             uploader: req.body.uploader
 
         };
         Movie.save_Movie(movieobj)
-            .then(result => res.json({ con: true, msg: movieobj }))
+            .then(result => res.json({ con: true, msg: result }))
             .catch(err => res.json({ con: false, msg: err }));
     })
 
-    router.get('/update/movie', (req, res) => {
+    // post bug fix
+    router.get('/update/movie', passport.authenticate('jwt', { session: false }), (req, res) => {
         let movieobj = {
             name: req.body.name,
             image: req.file.filename,
@@ -196,16 +205,17 @@ module.exports = (express, bodyParser) => {
             rating: req.body.rating,
             creater: req.body.creater,
             category: req.body.category,
-            discription: req.body.discription,
+            overview: req.body.overview,
             series: req.body.series,
-            trailer1: req.body.trailer,
-            trailer2: req.body.trailer,
+            trailer1: req.body.trailer1,
+            trailer2: req.body.trailer2,
             trailer3: req.body.trailer3,
             Network: req.body.Network,
             age_rating: req.body.age_rating,
-            weekly_download: req.body.weekly_download,
+            // weekly_download: req.body.weekly_download,
 
             // 1
+            download1site: req.body.download1site,
             download1Low: req.body.download1Low,
             download1Lowtext: req.body.download1Lowtext,
             download1High: req.body.download1High,
@@ -213,6 +223,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download2site: req.body.download2site,
             download2Low: req.body.download2Low,
             download2Lowtext: req.body.download2Lowtext,
             download2High: req.body.download2High,
@@ -220,6 +231,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download3site: req.body.download3site,
             download3Low: req.body.download3Low,
             download3Lowtext: req.body.download3Lowtext,
             download3High: req.body.download3High,
@@ -227,6 +239,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download4site: req.body.download4site,
             download4Low: req.body.download4Low,
             download4Lowtext: req.body.download4Lowtext,
             download4High: req.body.download4High,
@@ -234,6 +247,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download5site: req.body.download5site,
             download5Low: req.body.download5Low,
             download5Lowtext: req.body.download5Lowtext,
             download5High: req.body.download5High,
@@ -241,6 +255,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download6site: req.body.download6site,
             download6Low: req.body.download6Low,
             download6Lowtext: req.body.download6Lowtext,
             download6High: req.body.download6High,
@@ -248,6 +263,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download7site: req.body.download7site,
             download7Low: req.body.download7Low,
             download7Lowtext: req.body.download7Lowtext,
             download7High: req.body.download7High,
@@ -255,6 +271,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download8site: req.body.download8site,
             download8Low: req.body.download8Low,
             download8Lowtext: req.body.download8Lowtext,
             download8High: req.body.download8High,
@@ -262,6 +279,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download9site: req.body.download9site,
             download9Low: req.body.download9Low,
             download9Lowtext: req.body.download9Lowtext,
             download9High: req.body.download9High,
@@ -269,14 +287,13 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download10site: req.body.download10site,
             download10Low: req.body.download10Low,
             download10Lowtext: req.body.download10Lowtext,
             download10High: req.body.download10High,
             download10Hightext: req.body.download10Hightext,
 
             // 1
-
-
             encoder: req.body.encoder,
             translator: req.body.translator,
             uploader: req.body.uploader
@@ -286,19 +303,25 @@ module.exports = (express, bodyParser) => {
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
     })
+    // passport.authenticate('jwt', { session: false }),
 
-
-    router.post('/findmovie', (req, res) => {
-        let nameObj = {
-            name: req.body.name
-        }
-        Movie.findMovie(nameObj.name)
-            .then(result => res.send({ con: "hehe", msg: result }))
-            .catch(err => res.send({ con: false, msg: err }));
+    router.get('/findmovie/:movieid', (req, res) => {
+        let movieid = req.param('movieid');
+        Movie.findByMovieID(String(movieid))
+            .then(result => res.json({ con: "hehe", msg: result }))
+            .catch(err => res.json({ con: false, msg: err }));
+        // res.send(id)
+    })
+    // passport.authenticate('jwt', { session: false }),
+    router.post('/findMovie',  (req, res) => {
+        let name = req.body.name;
+        Movie.findMoviebyname(name)
+            .then(result => res.json({ con: true, msg: result }))
+            .catch(err => res.json({ con: false, msg: err }));
     })
     // Admin movie paginate
 
-    router.get('/movie/paginate/:start/:count', (req, res) => {
+    router.get('/movie/paginate/:start/:count', passport.authenticate('jwt', { session: false }), (req, res) => {
         let start = req.param('start');
         let count = req.param('count');
 
@@ -309,7 +332,7 @@ module.exports = (express, bodyParser) => {
 
     // Admin get all movie
 
-    router.get('/movies', (req, res) => {
+    router.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
         Movie.all_Movies()
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
@@ -318,16 +341,16 @@ module.exports = (express, bodyParser) => {
 
     // Admin delete movie
 
-    router.post('/delete/movie', (req, res) => {
-        let id = req.body._id;
-        Movie.destroy(id)
+    router.post('/delete/movie', passport.authenticate('jwt', { session: false }), (req, res) => {
+        let name = req.body.name;
+        Movie.destroy(name)
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
     })
 
 
     // passport.authenticate('jwt', { session: false }),
-    router.post('/post/mainmovie', upload.single('image'), (req, res) => {
+    router.post('/post/mainmovie', passport.authenticate('jwt', { session: false }), upload.single('image'), (req, res) => {
         let movieobj = {
             name: req.body.name,
             image: req.file.filename,
@@ -335,16 +358,17 @@ module.exports = (express, bodyParser) => {
             rating: req.body.rating,
             creater: req.body.creater,
             category: req.body.category,
-            discription: req.body.discription,
-            series: req.body.series,
-            trailer1: req.body.trailer,
-            trailer2: req.body.trailer,
+            overview: req.body.overview,
+            episodes: req.body.episodes,
+            trailer1: req.body.trailer1,
+            trailer2: req.body.trailer2,
             trailer3: req.body.trailer3,
             Network: req.body.Network,
             age_rating: req.body.age_rating,
             weekly_download: req.body.weekly_download,
 
             // 1
+            download1site: req.body.download1site,
             download1Low: req.body.download1Low,
             download1Lowtext: req.body.download1Lowtext,
             download1High: req.body.download1High,
@@ -352,6 +376,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download2site: req.body.download2site,
             download2Low: req.body.download2Low,
             download2Lowtext: req.body.download2Lowtext,
             download2High: req.body.download2High,
@@ -359,6 +384,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download3site: req.body.download3site,
             download3Low: req.body.download3Low,
             download3Lowtext: req.body.download3Lowtext,
             download3High: req.body.download3High,
@@ -366,6 +392,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download4site: req.body.download4site,
             download4Low: req.body.download4Low,
             download4Lowtext: req.body.download4Lowtext,
             download4High: req.body.download4High,
@@ -373,6 +400,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download5site: req.body.download5site,
             download5Low: req.body.download5Low,
             download5Lowtext: req.body.download5Lowtext,
             download5High: req.body.download5High,
@@ -380,6 +408,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download6site: req.body.download6site,
             download6Low: req.body.download6Low,
             download6Lowtext: req.body.download6Lowtext,
             download6High: req.body.download6High,
@@ -387,6 +416,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download7site: req.body.download7site,
             download7Low: req.body.download7Low,
             download7Lowtext: req.body.download7Lowtext,
             download7High: req.body.download7High,
@@ -394,6 +424,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download8site: req.body.download8site,
             download8Low: req.body.download8Low,
             download8Lowtext: req.body.download8Lowtext,
             download8High: req.body.download8High,
@@ -401,6 +432,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download9site: req.body.download9site,
             download9Low: req.body.download9Low,
             download9Lowtext: req.body.download9Lowtext,
             download9High: req.body.download9High,
@@ -408,6 +440,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download10site: req.body.download10site,
             download10Low: req.body.download10Low,
             download10Lowtext: req.body.download10Lowtext,
             download10High: req.body.download10High,
@@ -427,7 +460,7 @@ module.exports = (express, bodyParser) => {
             .catch(err => res.json({ con: false, msg: err }));
     })
 
-    router.get('/update/mainmovie', (req, res) => {
+    router.get('/update/mainmovie', passport.authenticate('jwt', { session: false }), upload.single('image'), (req, res) => {
         let movieobj = {
             name: req.body.name,
             image: req.file.filename,
@@ -435,16 +468,17 @@ module.exports = (express, bodyParser) => {
             rating: req.body.rating,
             creater: req.body.creater,
             category: req.body.category,
-            discription: req.body.discription,
-            series: req.body.series,
-            trailer1: req.body.trailer,
-            trailer2: req.body.trailer,
+            overview: req.body.overview,
+            episodes: req.body.episodes,
+            trailer1: req.body.trailer1,
+            trailer2: req.body.trailer2,
             trailer3: req.body.trailer3,
             Network: req.body.Network,
             age_rating: req.body.age_rating,
             weekly_download: req.body.weekly_download,
 
             // 1
+            download1site: req.body.download1site,
             download1Low: req.body.download1Low,
             download1Lowtext: req.body.download1Lowtext,
             download1High: req.body.download1High,
@@ -452,6 +486,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download2site: req.body.download2site,
             download2Low: req.body.download2Low,
             download2Lowtext: req.body.download2Lowtext,
             download2High: req.body.download2High,
@@ -459,6 +494,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download3site: req.body.download3site,
             download3Low: req.body.download3Low,
             download3Lowtext: req.body.download3Lowtext,
             download3High: req.body.download3High,
@@ -466,6 +502,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download4site: req.body.download4site,
             download4Low: req.body.download4Low,
             download4Lowtext: req.body.download4Lowtext,
             download4High: req.body.download4High,
@@ -473,6 +510,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download5site: req.body.download5site,
             download5Low: req.body.download5Low,
             download5Lowtext: req.body.download5Lowtext,
             download5High: req.body.download5High,
@@ -480,6 +518,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download6site: req.body.download6site,
             download6Low: req.body.download6Low,
             download6Lowtext: req.body.download6Lowtext,
             download6High: req.body.download6High,
@@ -487,6 +526,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download7site: req.body.download7site,
             download7Low: req.body.download7Low,
             download7Lowtext: req.body.download7Lowtext,
             download7High: req.body.download7High,
@@ -494,6 +534,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download8site: req.body.download8site,
             download8Low: req.body.download8Low,
             download8Lowtext: req.body.download8Lowtext,
             download8High: req.body.download8High,
@@ -501,6 +542,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download9site: req.body.download9site,
             download9Low: req.body.download9Low,
             download9Lowtext: req.body.download9Lowtext,
             download9High: req.body.download9High,
@@ -508,6 +550,7 @@ module.exports = (express, bodyParser) => {
 
             // 1
             // 1
+            download10site: req.body.download10site,
             download10Low: req.body.download10Low,
             download10Lowtext: req.body.download10Lowtext,
             download10High: req.body.download10High,

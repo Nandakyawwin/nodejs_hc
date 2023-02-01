@@ -63,31 +63,106 @@ module.exports = (express, bodyParser) => {
 
     router.post('/post/movie', upload.single('image'), (req, res) => {
         let movieobj = {
-            name: req.file.name,
+            name: req.body.name,
             image: req.file.filename,
-            Duration: req.file.Duration,
-            rating: req.file.rating,
-            creater: req.file.creater,
-            discription: req.file.discription,
-            series: req.file.series,
-            trailer1: req.file.trailer,
-            trailer2: req.file.trailer,
-            trailer3: req.file.trailer,
-            Network: req.file.Network,
-            age_rating: req.file.age_rating,
-            weekly_download: req.file.weekly_download,
-            download1: req.file.download1,
-            download2: req.file.download2,
-            download3: req.file.download3,
-            download4: req.file.download4,
-            download5: req.file.download5,
-            download6: req.file.download6,
-            download7: req.file.download7,
-            download8: req.file.download8,
-            download9: req.file.download9,
-            download10: req.file.download10,
-            encoder: req.file.encoder,
-            translator: req.file.translator
+            Duration: req.body.Duration,
+            rating: req.body.rating,
+            creater: req.body.creater,
+            category: req.body.category,
+            overview: req.body.overview,
+            episodes: req.body.episodes,
+            trailer1: req.body.trailer1,
+            trailer2: req.body.trailer2,
+            trailer3: req.body.trailer3,
+            Network: req.body.Network,
+            age_rating: req.body.age_rating,
+            weekly_download: req.body.weekly_download,
+
+            // 1
+            download1site: req.body.download1site,
+            download1Low: req.body.download1Low,
+            download1Lowtext: req.body.download1Lowtext,
+            download1High: req.body.download1High,
+            download1Hightext: req.body.download1Hightext,
+
+            // 1
+            // 1
+            download2site: req.body.download2site,
+            download2Low: req.body.download2Low,
+            download2Lowtext: req.body.download2Lowtext,
+            download2High: req.body.download2High,
+            download2Hightext: req.body.download2Hightext,
+
+            // 1
+            // 1
+            download3site: req.body.download3site,
+            download3Low: req.body.download3Low,
+            download3Lowtext: req.body.download3Lowtext,
+            download3High: req.body.download3High,
+            download3Hightext: req.body.download3Hightext,
+
+            // 1
+            // 1
+            download4site: req.body.download4site,
+            download4Low: req.body.download4Low,
+            download4Lowtext: req.body.download4Lowtext,
+            download4High: req.body.download4High,
+            download4Hightext: req.body.download4Hightext,
+
+            // 1
+            // 1
+            download5site: req.body.download5site,
+            download5Low: req.body.download5Low,
+            download5Lowtext: req.body.download5Lowtext,
+            download5High: req.body.download5High,
+            download5Hightext: req.body.download5Hightext,
+
+            // 1
+            // 1
+            download6site: req.body.download6site,
+            download6Low: req.body.download6Low,
+            download6Lowtext: req.body.download6Lowtext,
+            download6High: req.body.download6High,
+            download6Hightext: req.body.download6Hightext,
+
+            // 1
+            // 1
+            download7site: req.body.download7site,
+            download7Low: req.body.download7Low,
+            download7Lowtext: req.body.download7Lowtext,
+            download7High: req.body.download7High,
+            download7Hightext: req.body.download7Hightext,
+
+            // 1
+            // 1
+            download8site: req.body.download8site,
+            download8Low: req.body.download8Low,
+            download8Lowtext: req.body.download8Lowtext,
+            download8High: req.body.download8High,
+            download8Hightext: req.body.download8Hightext,
+
+            // 1
+            // 1
+            download9site: req.body.download9site,
+            download9Low: req.body.download9Low,
+            download9Lowtext: req.body.download9Lowtext,
+            download9High: req.body.download9High,
+            download9Hightext: req.body.download9Hightext,
+
+            // 1
+            // 1
+            download10site: req.body.download10site,
+            download10Low: req.body.download10Low,
+            download10Lowtext: req.body.download10Lowtext,
+            download10High: req.body.download10High,
+            download10Hightext: req.body.download10Hightext,
+
+            // 1
+
+
+            encoder: req.body.encoder,
+            translator: req.body.translator,
+            uploader: req.body.uploader
 
         };
         Movie.save_Movie(movieobj)
@@ -95,36 +170,110 @@ module.exports = (express, bodyParser) => {
             .catch(err => res.json({ con: false, msg: err }));
     })
 
-    router.get('/update/movie', (req, res) => {
+    router.get('/update/movie', upload.single('image'), (req, res) => {
         let movieobj = {
-            name: req.file.name,
+            name: req.body.name,
             image: req.file.filename,
-            Duration: req.file.Duration,
-            rating: req.file.rating,
-            creater: req.file.creater,
-            discription: req.file.discription,
-            series: req.file.series,
-            trailer1: req.file.trailer,
-            trailer2: req.file.trailer,
-            trailer3: req.file.trailer,
-            Network: req.file.Network,
-            age_rating: req.file.age_rating,
-            weekly_download: req.file.weekly_download,
-            download1: req.file.download1,
-            download2: req.file.download2,
-            download3: req.file.download3,
-            download4: req.file.download4,
-            download5: req.file.download5,
-            download6: req.file.download6,
-            download7: req.file.download7,
-            download8: req.file.download8,
-            download9: req.file.download9,
-            download10: req.file.download10,
-            encoder: req.file.encoder,
-            translator: req.file.translator
+            Duration: req.body.Duration,
+            rating: req.body.rating,
+            creater: req.body.creater,
+            category: req.body.category,
+            overview: req.body.overview,
+            episodes: req.body.episodes,
+            trailer1: req.body.trailer1,
+            trailer2: req.body.trailer2,
+            trailer3: req.body.trailer3,
+            Network: req.body.Network,
+            age_rating: req.body.age_rating,
+            weekly_download: req.body.weekly_download,
+
+            // 1
+            download1site: req.body.download1site,
+            download1Low: req.body.download1Low,
+            download1Lowtext: req.body.download1Lowtext,
+            download1High: req.body.download1High,
+            download1Hightext: req.body.download1Hightext,
+
+            // 1
+            // 1
+            download2site: req.body.download2site,
+            download2Low: req.body.download2Low,
+            download2Lowtext: req.body.download2Lowtext,
+            download2High: req.body.download2High,
+            download2Hightext: req.body.download2Hightext,
+
+            // 1
+            // 1
+            download3site: req.body.download3site,
+            download3Low: req.body.download3Low,
+            download3Lowtext: req.body.download3Lowtext,
+            download3High: req.body.download3High,
+            download3Hightext: req.body.download3Hightext,
+
+            // 1
+            // 1
+            download4site: req.body.download4site,
+            download4Low: req.body.download4Low,
+            download4Lowtext: req.body.download4Lowtext,
+            download4High: req.body.download4High,
+            download4Hightext: req.body.download4Hightext,
+
+            // 1
+            // 1
+            download5site: req.body.download5site,
+            download5Low: req.body.download5Low,
+            download5Lowtext: req.body.download5Lowtext,
+            download5High: req.body.download5High,
+            download5Hightext: req.body.download5Hightext,
+
+            // 1
+            // 1
+            download6site: req.body.download6site,
+            download6Low: req.body.download6Low,
+            download6Lowtext: req.body.download6Lowtext,
+            download6High: req.body.download6High,
+            download6Hightext: req.body.download6Hightext,
+
+            // 1
+            // 1
+            download7site: req.body.download7site,
+            download7Low: req.body.download7Low,
+            download7Lowtext: req.body.download7Lowtext,
+            download7High: req.body.download7High,
+            download7Hightext: req.body.download7Hightext,
+
+            // 1
+            // 1
+            download8site: req.body.download8site,
+            download8Low: req.body.download8Low,
+            download8Lowtext: req.body.download8Lowtext,
+            download8High: req.body.download8High,
+            download8Hightext: req.body.download8Hightext,
+
+            // 1
+            // 1
+            download9site: req.body.download9site,
+            download9Low: req.body.download9Low,
+            download9Lowtext: req.body.download9Lowtext,
+            download9High: req.body.download9High,
+            download9Hightext: req.body.download9Hightext,
+
+            // 1
+            // 1
+            download10site: req.body.download10site,
+            download10Low: req.body.download10Low,
+            download10Lowtext: req.body.download10Lowtext,
+            download10High: req.body.download10High,
+            download10Hightext: req.body.download10Hightext,
+
+            // 1
+
+
+            encoder: req.body.encoder,
+            translator: req.body.translator,
+            uploader: req.body.uploader
 
         };
-
         Job.update(movieobj)
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
