@@ -15,6 +15,7 @@ let all_mod = () => {
 let save_mod = (modObj) => {
     return new Promise((resolve, reject) => {
         modObj['since'] = new Date();
+        modObj['role'] = 'mod';
         let mod = new Mod(modObj);
         mod.save((error, data) => {
             if (error) reject(error);

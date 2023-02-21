@@ -4,10 +4,9 @@ module.exports = (express) => {
     let Movie = require('../database/movie');
     let Job = require('../database/job');
     let User = require('../database/user');
-    let Comment = require('../database/comment');
     let Ads = require('../database/ads');
 
-    // Guest register to user 
+    // Guest register to user
 
     router.post('/register', (req, res) => {
         let email = req.body.email;
@@ -37,7 +36,6 @@ module.exports = (express) => {
 
     // Guest login to user
 
-
     router.post('/login', (req, res) => {
 
         let email = req.body.email;
@@ -59,16 +57,58 @@ module.exports = (express) => {
             .catch(err => res.json({ con: false, msg: 'something went wrong!!' }));
     });
 
-    // Guest get all Movies
+    // Guest get Main Movies
 
-    router.get('/movies', (req, res) => {
-        Movie.all_Movies()
+    router.get('/mainMovies', (req, res) => {
+        Movie.mainMoviePaginate()
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
 
     });
 
-    // Guest all movie paginate
+    // Guest get Main Movies
+
+    router.get('/trendingMovie', (req, res) => {
+        Movie.all_movie()
+            .then(result => res.send({ con: true, msg: result }))
+            .catch(err => res.send({ con: false, msg: err }));
+    })
+
+    // Guest get latest Movies
+
+    router.get('/latestMovies', (req, res) => {
+        Movie.latestMoviePaginate()
+            .then(result => res.send({ con: true, msg: result }))
+            .catch(err => res.send({ con: false, msg: err }));
+
+    });
+
+    // Guest get latest Movies
+
+    // Guest Get movie Details and viewer count
+
+    router.get('/movieDetails/:movieid', (req, res) => {
+        let movieid = req.param('movieid');
+        Movie.increase(String(movieid))
+            .then(result => res.json({ con: true, msg: result }))
+            .catch(err => res.send({ con: false, msg: err }));
+
+    })
+
+    // Guest Get movie Details and viewer count
+
+    // Guest movie categorySearch
+
+    router.post('/movieCategory', (req, res) => {
+        let category = req.body.category;
+        Movie.categorySearch(category)
+            .then(result => res.json({ con: true, msg: result }))
+            .catch(err => res.send({ con: false, msg: err }));
+    })
+
+    // Guest movie categorySearch
+
+    // Guest movie paginate
 
     router.get('/movie/paginate/:start/:count', (req, res) => {
         let start = req.param('start');
@@ -79,16 +119,27 @@ module.exports = (express) => {
             .catch(err => res.send({ con: false, msg: err }));
     });
 
-    //Guest all jobs
+    // Guest movie paginate
 
-    router.get('/jobs', (req, res) => {
-        Job.all_Job()
+    // Guest movie season
+
+    router.post('/movieSeason', (req, res) => {
+        let episodes = req.body.episodes;
+        Movie.episodes(episodes)
+            .then(result => res.send({ con: true, msg: result }))
+            .catch(err => res.send({ con: false, msg: err }));
+    })
+
+    // Guest movie season
+
+    router.post('/findMovie', (req, res) => {
+        let name = req.body.name;
+        Movie.findMoviebyname(name)
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
 
-    });
-
-    // Guest all job paginate
+    })
+    // Guest job paginate
 
     router.get('/job/paginate/:start/:count', (req, res) => {
         let start = req.param('start');
@@ -99,32 +150,18 @@ module.exports = (express) => {
             .catch(err => res.send({ con: false, msg: err }));
     });
 
-    // Guest all ads 
+    // Guest paginate ads 
 
-    router.get('/ads', (req, res) => {
-        Ads.all_ads()
+    router.get('/ads/paginate/:start/:count', (req, res) => {
+        let start = req.param('start');
+        let count = req.param('count');
+
+        Ads.paginate(Number(start), Number(count))
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
 
     });
 
-    // Guest all comments 
-
-    router.get('/comments', (req, res) => {
-        Comment.all_comments()
-            .then(result => res.send({ con: true, msg: result }))
-            .catch(err => res.send({ con: false, msg: err }));
-
-    });
-
-    // Guest search movie 
-
-    router.post('/searchMovie', (req, res) => {
-        let searchM = req.body.name;
-        Movie.findMovie(searchM)
-            .then(result => res.send({ con: true, msg: result }))
-            .catch(err => res.send({ con: false, msg: err }));
-    })
     return router;
 
 }

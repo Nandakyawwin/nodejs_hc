@@ -22,7 +22,7 @@ module.exports = (express, bodyParser) => {
     let Ads = require('../database/ads');
     let Mod = require('../database/mod');
 
-    // Admin login route
+    // Mod login route
 
     router.post('/modLogin', (req, res) => {
 
@@ -30,53 +30,67 @@ module.exports = (express, bodyParser) => {
         let password = req.body.password;
 
         Mod.findByModemail(email)
-            .then(mod => {
-                bcrypt.compare(password, mod.password)
+            .then(admin => {
+                bcrypt.compare(password, admin.password)
                     .then(result => {
                         if (result) {
-                            let payload = { email: mod.email, name: mod.name };
+                            let payload = { email: admin.email, name: admin.name };
                             let token = jwt.sign(payload, process.env.SECRET);
-                            res.json({ con: true, token: token });
+                            res.json({ con: true, token: token, name: admin });
                         } else {
                             res.json({ con: false, msg: 'password wrong' })
                         }
                     }).catch(err => res.send({ con: false, msg: err }));
             })
-            .catch(err => res.send({ con: false, msg: "Mod login error" }));
+            .catch(err => res.send({ con: false, msg: "admin login error" }));
     });
 
-    // Admin Register route
 
-
-    router.get('/update', (req, res) => {
-        let modobj = {
+    // Mod update
+    router.get('/update', passport.authenticate('jwt', { session: false }), (req, res) => {
+        let modObj = {
             name: req.body.name,
             email: req.body.email,
             password: req.body.password
         };
 
-        Mod.update_mod(modobj)
+        Mod.update_mod(modObj)
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
     })
-    // Admin Movie Part 
 
-    router.post('/post/movie', upload.single('image'), (req, res) => {
+    ///////////////////////////////////////////////////////////
+    ///////////////                          //////////////////
+    //////////////                           //////////////////
+    //////////////        Mod Movie          //////////////////
+    //////////////                           //////////////////
+    //////////////                           //////////////////
+    ///////////////////////////////////////////////////////////
+
+    // Admin Movie Part
+
+    // Admin Post movie
+
+    router.post('/post/movie', passport.authenticate('jwt', { session: false }), upload.fields([
+        { name: 'image', maxCount: 1 },
+        { name: 'coverimage', maxCount: 1 },
+    ]), (req, res) => {
         let movieobj = {
             name: req.body.name,
-            image: req.file.filename,
+            image: req.files.image[0].filename,
+            coverimage: req.files.coverimage[0].filename,
             Duration: req.body.Duration,
             rating: req.body.rating,
+            date: req.body.date,
             creater: req.body.creater,
             category: req.body.category,
             overview: req.body.overview,
-            episodes: req.body.episodes,
+            series: req.body.series,
             trailer1: req.body.trailer1,
             trailer2: req.body.trailer2,
             trailer3: req.body.trailer3,
             Network: req.body.Network,
             age_rating: req.body.age_rating,
-            weekly_download: req.body.weekly_download,
 
             // 1
             download1site: req.body.download1site,
@@ -158,34 +172,41 @@ module.exports = (express, bodyParser) => {
             download10Hightext: req.body.download10Hightext,
 
             // 1
-
-
             encoder: req.body.encoder,
             translator: req.body.translator,
             uploader: req.body.uploader
 
         };
         Movie.save_Movie(movieobj)
-            .then(result => res.json({ con: true, msg: movieobj }))
+            .then(result => res.json({ con: true, msg: result }))
             .catch(err => res.json({ con: false, msg: err }));
     })
 
-    router.get('/update/movie', upload.single('image'), (req, res) => {
+    // Admin Post movie
+
+    // Admin Update movie
+
+    router.post('/update/movie', passport.authenticate('jwt', { session: false }), upload.fields([
+        { name: 'image', maxCount: 1 },
+        { name: 'coverimage', maxCount: 1 },
+    ]), (req, res) => {
         let movieobj = {
             name: req.body.name,
-            image: req.file.filename,
+            image: req.files.image[0].filename,
+            coverimage: req.files.coverimage[0].filename,
             Duration: req.body.Duration,
             rating: req.body.rating,
             creater: req.body.creater,
+            date: req.body.date,
             category: req.body.category,
             overview: req.body.overview,
-            episodes: req.body.episodes,
+            series: req.body.series,
             trailer1: req.body.trailer1,
             trailer2: req.body.trailer2,
             trailer3: req.body.trailer3,
             Network: req.body.Network,
             age_rating: req.body.age_rating,
-            weekly_download: req.body.weekly_download,
+            // weekly_download: req.body.weekly_download,
 
             // 1
             download1site: req.body.download1site,
@@ -267,21 +288,30 @@ module.exports = (express, bodyParser) => {
             download10Hightext: req.body.download10Hightext,
 
             // 1
-
-
             encoder: req.body.encoder,
             translator: req.body.translator,
             uploader: req.body.uploader
 
         };
-        Job.update(movieobj)
+        Movie.update(movieobj)
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
     })
 
+    // Admin Update movie
+
+    // Admin movie details
+
+    router.get('/movieDetails/:movieid', passport.authenticate('jwt', { session: false }), (req, res) => {
+        let movieid = req.param('movieid');
+        Movie.increase(String(movieid))
+            .then(result => res.json({ con: true, msg: result }))
+            .catch(err => res.json({ con: false, msg: err }));
+    })
+
     // Admin movie paginate
 
-    router.get('/movie/paginate/:start/:count', (req, res) => {
+    router.get('/movie/paginate/:start/:count', passport.authenticate('jwt', { session: false }), (req, res) => {
         let start = req.param('start');
         let count = req.param('count');
 
@@ -292,18 +322,17 @@ module.exports = (express, bodyParser) => {
 
     // Admin get all movie
 
-    router.get('/movies', (req, res) => {
-        Movie.all_Movies()
+    // Admin delete movie
+    router.delete('/delete/movie', passport.authenticate('jwt', { session: false }), (req, res) => {
+        let name = req.body.name;
+        Movie.destroy(name)
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
+    })
 
-    });
-
-    // Admin delete movie
-
-    router.post('/delete/movie', (req, res) => {
-        let movie_name = req.body.name;
-        Movie.destroy(movie_name)
+    router.post('/movieSeason', passport.authenticate('jwt', { session: false }), (req, res) => {
+        let episodes = req.body.episodes;
+        Movie.episodes(episodes)
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
     })
@@ -312,24 +341,13 @@ module.exports = (express, bodyParser) => {
 
     // Job
 
-    router.post('/post/job', (req, res) => {
-        let jobObj = {
-            name: req.body.name,
-            discription: req.body.discription
-
-        };
-        Job.save_Job(jobObj)
-        then(result => res.json({ con: true, msg: jobObj }))
-            .catch(err => res.json({ con: false, msg: err }));
-
-    });
-
-    router.get('/all/job', (req, res) => {
-        Job.all_Job()
-            .then(result => res.send({ con: true, msg: result }))
-            .catch(err => res.send({ con: false, msg: err }));
-
-    });
+    ///////////////////////////////////////////////////////////
+    //////////////                           //////////////////
+    //////////////                           //////////////////
+    //////////////        Admin Job          //////////////////
+    //////////////                           //////////////////
+    //////////////                           //////////////////
+    ///////////////////////////////////////////////////////////
 
     router.get('/job/paginate/:start/:count', (req, res) => {
         let start = req.param('start');
@@ -340,45 +358,15 @@ module.exports = (express, bodyParser) => {
             .catch(err => res.send({ con: false, msg: err }));
     });
 
-    router.post('/delete/job', (req, res) => {
-        let job_name = req.body.name;
-        Job.destroy(job_name)
-            .then(result => res.send({ con: true, msg: result }))
-            .catch(err => res.send({ con: false, msg: err }));
-    })
-
-    router.get('/update/job', (req, res) => {
-        let jobObj = {
-            name: req.body.name,
-            discription: req.body.discription
-        };
-
-        Job.update(jobObj)
-            .then(result => res.send({ con: true, msg: result }))
-            .catch(err => res.send({ con: false, msg: err }));
-    })
-    // Job
-
     // ads
 
-    router.post('/post/ads', (req, res) => {
-        let ads = {
-            name: req.body.name,
-            discription: req.body.discription
-
-        };
-        Ads.save_ads(ads)
-        then(result => res.json({ con: true, msg: ads }))
-            .catch(err => res.json({ con: false, msg: err }));
-
-    });
-
-    router.get('/all/ads', (req, res) => {
-        Ads.all_ads()
-            .then(result => res.send({ con: true, msg: result }))
-            .catch(err => res.send({ con: false, msg: err }));
-
-    });
+    ///////////////////////////////////////////////////////////
+    ///////////////                          //////////////////
+    //////////////                           //////////////////
+    //////////////        Admin Ads          //////////////////
+    //////////////                           //////////////////
+    //////////////                           //////////////////
+    ///////////////////////////////////////////////////////////
 
     router.get('/ads/paginate/:start/:count', (req, res) => {
         let start = req.param('start');
@@ -389,24 +377,26 @@ module.exports = (express, bodyParser) => {
             .catch(err => res.send({ con: false, msg: err }));
     })
 
-    router.post('/delete/ads', (req, res) => {
-        let ads_name = req.body.name;
-        Ads.delete_ads(ads_name)
+    // user
+
+    ///////////////////////////////////////////////////////////
+    ///////////////                          //////////////////
+    //////////////                           //////////////////
+    //////////////        Admin user         //////////////////
+    //////////////                           //////////////////
+    //////////////                           //////////////////
+    ///////////////////////////////////////////////////////////
+
+    router.get('/user/paginate/:start/:count', (req, res) => {
+        let start = req.param('start');
+        let count = req.param('count');
+
+        User.paginate(Number(start), Number(count))
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
     })
 
-    router.get('/update/ads', (req, res) => {
-        let adsObj = {
-            name: req.body.name,
-        };
-
-        Ads.update_ads(adsObj)
-            .then(result => res.send({ con: true, msg: result }))
-            .catch(err => res.send({ con: false, msg: err }));
-    })
-    // ads
-
+    // user
 
     return router;
 

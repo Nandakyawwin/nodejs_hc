@@ -2,18 +2,19 @@ let db = require('./db');
 
 let Movie = db.Movie;
 
-let all_Movies = () => {
+let all_movie = () => {
     return new Promise((resolve, reject) => {
-        Movie.find({}, (err, data) => {
-            if (err) reject(err);
+        Movie.find({}, (error, data) => {
+            if (error) reject(error);
             resolve(data);
         })
     })
-};
+}
 
 let save_Movie = (movieObj) => {
     return new Promise((resolve, reject) => {
         movieObj['since'] = new Date();
+        movieObj['count'] = 0;
         let movie = new Movie(movieObj);
         movie.save((err, data) => {
             if (err) reject(err);
@@ -24,14 +25,16 @@ let save_Movie = (movieObj) => {
 
 let update = (movieobj) => {
     return new Promise((resolve, reject) => {
-        Movie.findOne({ name: movieobj.name }, (error, data) => {
+        Movie.findOne({ movieid: movieobj.movieid }, (error, data) => {
             if (error) {
                 reject(error);
             } else {
                 data.name = movieobj.name;
                 data.image = movieobj.image;
+                data.coverimage = movieobj.coverimage;
                 data.Duration = movieobj.Duration;
                 data.rating = movieobj.rating;
+                data.date = movieobj.date;
                 data.creater = movieobj.creater;
                 data.overview = movieobj.overview;
                 data.episodes = movieobj.episodes;
@@ -103,9 +106,9 @@ let update = (movieobj) => {
     })
 };
 
-let destroy = (movieobj) => {
+let destroy = (movieid) => {
     return new Promise((resolve, reject) => {
-        Movie.deleteOne({ name: movieobj }, (error, data) => {
+        Movie.deleteOne({ movieid: movieid }, (error, data) => {
             if (error) reject(error);
             resolve('Deleted.')
         })
@@ -114,12 +117,11 @@ let destroy = (movieobj) => {
 
 let paginate = (start, count) => {
     let paginateObj = {
-        sort: { _id: 1 },
+        sort: { since: -1 },
         lean: true,
         page: start,
         limit: count
     };
-    console.log(`Start ${start} and Count is ${count}`);
     return new Promise((resolve, reject) => {
         Movie.paginate({}, paginateObj, (error, data) => {
             if (error) reject(error);
@@ -128,18 +130,48 @@ let paginate = (start, count) => {
     })
 }
 
-let findMovie = (id) => {
+let mainMoviePaginate = () => {
+    let paginateObj = {
+        sort: { since: -1 },
+        lean: true,
+        page: 1,
+        limit: 3
+    };
     return new Promise((resolve, reject) => {
-        Movie.findOne({ _id: id }, (error, data) => {
+        Movie.paginate({}, paginateObj, (error, data) => {
             if (error) reject(error);
-            resolve(data)
+            resolve(data);
+        })
+    })
+}
+
+let latestMoviePaginate = () => {
+    let paginateObj = {
+        sort: { since: -1 },
+        lean: true,
+        page: 1,
+        limit: 10
+    };
+    return new Promise((resolve, reject) => {
+        Movie.paginate({}, paginateObj, (error, data) => {
+            if (error) reject(error);
+            resolve(data);
+        })
+    })
+}
+
+let categorySearch = (cat) => {
+    return new Promise((resolve, reject) => {
+        Movie.find({ category: cat }, (error, data) => {
+            if (error) reject(error);
+            resolve(data);
         })
     })
 }
 
 let findMoviebyname = (name) => {
     return new Promise((resolve, reject) => {
-        Movie.find({ name: name }, (error, data) => {
+        Movie.find({ name: { $regex: new RegExp('^' + name + '.*' ) } }, (error, data) => {
             if (error) reject(error)
             resolve(data);
         })
@@ -148,21 +180,58 @@ let findMoviebyname = (name) => {
 
 let findByMovieID = (id) => {
     return new Promise((resolve, reject) => {
-        Movie.find({movieid: id}, (error, data) => {
+        Movie.find({ movieid: id }, (error, data) => {
+            if (error) {
+                reject(error);
+            } else {
+                // data.count = data.count++;
+                // // let movie = new Movie(data);
+                // data.save((error, dat) => {
+                //     if (error) reject(error);
+                //     resolve(dat);
+                // })
+                resolve(data)
+            }
+        })
+    })
+}
+
+let increase = (movieid) => {
+    return new Promise((resolve, reject) => {
+        Movie.findOne({ movieid: movieid }, (error, data) => {
+            if (error) {
+                reject(error)
+            } else {
+                data.count++;
+                data.save((err, daat) => {
+                    if (err) reject(err);
+                    resolve(daat);
+                })
+            }
+        })
+    })
+}
+
+let episodes = (episodes) => {
+    return new Promise((resolve, reject) => {
+        Movie.findOne({ episodes: episodes }, (error, data) => {
             if (error) reject(error);
             resolve(data);
         })
     })
 }
 
-
 module.exports = {
-    all_Movies,
+    all_movie,
     save_Movie,
     update,
     destroy,
+    episodes,
     paginate,
-    findMovie,
+    mainMoviePaginate,
+    latestMoviePaginate,
+    increase,
+    categorySearch,
     findMoviebyname,
     findByMovieID
 }
