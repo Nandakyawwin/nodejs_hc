@@ -45,6 +45,10 @@ app.use('/admin', adminRoute);
 app.use('/mod', modRoute);
 app.use('/', guestRoute);
 
+// Movie.destroy('98')
+//     .then(res => console.log(res))
+//     .catch(err => console.log(err));
+
 app.listen(process.env.PORT, _ => {
     console.log(`Server is running at ${process.env.PORT}`);
 });

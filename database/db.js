@@ -82,6 +82,10 @@ let MovieScheme = new Schema({
 
 });
 
+let SeasonScheme = new Schema({
+    name: { type: String, required: true },
+})
+
 let UserScheme = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },

@@ -371,9 +371,9 @@ module.exports = (express, bodyParser) => {
 
     // Admin delete movie
 
-    router.delete('/delete/movie', passport.authenticate('jwt', { session: false }), (req, res) => {
-        let name = req.body.movieid;
-        Movie.destroy(name)
+    router.post('/delete/movie', passport.authenticate('jwt', { session: false }), (req, res) => {
+        let id = req.body.movieid;
+        Movie.destroy(String(id))
             .then(result => res.send({ con: true, msg: result }))
             .catch(err => res.send({ con: false, msg: err }));
     })
